@@ -1,0 +1,2 @@
+controller处理请求 -> service处理具体的业务逻辑 -> dao直接和数据库进行交互
+所以一般是controller调service，service调dao
