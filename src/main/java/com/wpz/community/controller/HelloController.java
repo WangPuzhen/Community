@@ -1,20 +1,23 @@
 package com.wpz.community.controller;
 
 import com.wpz.community.service.AlphaService;
+import com.wpz.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
 @Controller
-@RequestMapping("/start")
+@RequestMapping("/hello")
 public class HelloController {
 
     @Autowired
@@ -64,7 +67,6 @@ public class HelloController {
 
     //两种get请求
     // 第一种： /students?current=1&limit=20
-
     @RequestMapping(path = "/students", method = RequestMethod.GET)
     @ResponseBody
     public String getStudents(@RequestParam(name = "current", required = false, defaultValue = "1") int current,
@@ -136,4 +138,57 @@ public class HelloController {
         return list; // 如果有@ResponseBody，返回对象的话，就会自动转换为JSON字符串，供其他地方解析使用
     }
 
+    // cookie示例
+    @RequestMapping(path = "/cookie/set", method = RequestMethod.GET)
+    @ResponseBody
+    public String setCookie(HttpServletResponse response){ // cookie是服务器响应给浏览器的，并由浏览器（客户端）本地保存
+        // 创建cookie
+        Cookie cookie = new Cookie("code", CommunityUtil.generaterUUID());
+        // 设置cookie生效的范围
+        cookie.setPath("/community/hello");
+        // 设置cookie的生存时间
+//        cookie.setMaxAge(60 * 10); // 若不设置，则默认浏览器关闭，cookie到期
+        // 服务器响应请求并发送cookie
+        response.addCookie(cookie);
+
+        return "本次请求由服务器设置了一个cookie发送给客户端";
+
+    }
+
+    @RequestMapping(path = "/cookie/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getCookie(@CookieValue("code") String code){
+        System.out.println(code);
+
+        return "客户端携带cookie向服务器发送请求";
+    }
+
+    // session示例
+    @RequestMapping(path = "/session/set", method = RequestMethod.GET)
+    @ResponseBody
+    public String setSession(HttpSession session){ // session由Spring自动注入容器
+        session.setAttribute("id", 1);
+        session.setAttribute("name", "Test");
+
+        return "用户请求使服务器在自己的内存中设置了一个session，并将sessionId附在cookie中返回给浏览器";
+    }
+
+    @RequestMapping(path = "/session/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getSession(HttpSession session){
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+
+        return "浏览器带着seesionId访问服务器，服务器返回相关信息";
+    }
+
+    // ajax示例, 在页面不刷新的情况下，向服务器请求或提交了一些结果
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody // 由于是异步请求，所以返回的不是网页而是字符串
+    public String testAjax(String name, int age){
+        System.out.println(name);
+        System.out.println(age);
+
+        return CommunityUtil.getJSONString(0, "操作成功");
+    }
 }
