@@ -2,8 +2,10 @@ package com.wpz.community;
 
 import com.wpz.community.dao.DiscussPostMapper;
 import com.wpz.community.dao.LoginTicketMapper;
+import com.wpz.community.dao.MessageMapper;
 import com.wpz.community.entity.DiscussPost;
 import com.wpz.community.entity.LoginTicket;
+import com.wpz.community.entity.Message;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class MapperTests {
 
     @Autowired
     private LoginTicketMapper loginTicketMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Test
     public void testSelectPosts(){
@@ -70,5 +75,27 @@ public class MapperTests {
         discussPost.setCreateTime(new Date());
         int res = discussPostMapper.insertDiscussPost(discussPost);
         System.out.println(res);
+    }
+
+    @Test
+    public void testSelectLetters(){
+        List<Message> list = messageMapper.selectConversations(111, 0, 20);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        list = messageMapper.selectLetters("111_112", 0, 10);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
     }
 }
