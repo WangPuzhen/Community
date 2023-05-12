@@ -4,7 +4,9 @@ import com.wpz.community.entity.DiscussPost;
 import com.wpz.community.entity.Page;
 import com.wpz.community.entity.User;
 import com.wpz.community.service.DiscussPostService;
+import com.wpz.community.service.LikeService;
 import com.wpz.community.service.UserService;
+import com.wpz.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,13 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class HomeController {
+public class HomeController implements CommunityConstant {
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private LikeService likeService;
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page){ // 由Page来控制分页的相关信息
@@ -41,6 +46,11 @@ public class HomeController {
                 map.put("post", discussPost);
                 User user = userService.findUserById(discussPost.getUserId()); // 找到userId对应的User
                 map.put("user", user);
+
+                // 查询赞的数量
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, discussPost.getId());
+                map.put("likeCount", likeCount);
+
                 discussPosts.add(map);
             }
         }

@@ -19,7 +19,6 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = CommunityApplication.class) // 用run时的环境测试程序
-
 public class MapperTests {
 
     @Autowired

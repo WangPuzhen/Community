@@ -4,6 +4,7 @@ import com.wpz.community.entity.LoginTicket;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
+@Deprecated // 有redis后，就不推荐这个了
 public interface LoginTicketMapper {
 
     @Insert({
